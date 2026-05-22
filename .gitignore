@@ -33,3 +33,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Generated docs (regenerate with generate_docs.py)
+docs/*.pdf

@@ -5,12 +5,16 @@ Handles PDF loading, text chunking, embedding generation, and vector store persi
 
 import os
 import glob
+import shutil
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DOCS_DIR = os.path.join(os.path.dirname(__file__), "docs")
+DOCS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
+CHROMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
+COLLECTION_NAME = "rag_documents"
 
 
 def load_documents(docs_dir: str = DOCS_DIR) -> list:
@@ -42,15 +46,10 @@ def chunk_documents(documents: list, chunk_size: int = None, chunk_overlap: int 
 
     Strategy rationale:
     - RecursiveCharacterTextSplitter tries to split on natural boundaries (paragraphs,
-      sentences, words) before resorting to character-level splits. This preserves
-      semantic coherence within chunks better than naive fixed-size splitting.
-    - chunk_size=500 balances granularity (too small loses context) with precision
-      (too large dilutes relevant information during retrieval).
-    - chunk_overlap=100 ensures continuity across chunk boundaries, reducing the risk
-      of splitting critical information between two chunks.
+      sentences, words) before resorting to character-level splits.
+    - chunk_size=500 balances granularity with precision.
+    - chunk_overlap=100 ensures no critical information is lost at chunk boundaries.
     """
-    from langchain_text_splitters import RecursiveCharacterTextSplitter
-
     _chunk_size = chunk_size or int(os.getenv("CHUNK_SIZE", 500))
     _chunk_overlap = chunk_overlap or int(os.getenv("CHUNK_OVERLAP", 100))
 
@@ -72,18 +71,12 @@ def chunk_documents(documents: list, chunk_size: int = None, chunk_overlap: int 
     return chunks
 
 
-CHROMA_DIR = os.path.join(os.path.dirname(__file__), "chroma_db")
-COLLECTION_NAME = "rag_documents"
-
-
 def create_vectorstore(chunks: list, persist_dir: str = CHROMA_DIR) -> None:
     """
-    Generate embeddings for all chunks and store them in a persistent ChromaDB instance.
-    Uses sentence-transformers/all-MiniLM-L6-v2 — a lightweight model that produces
-    384-dimensional embeddings optimized for semantic similarity tasks.
+    Generate embeddings for all chunks and store them in a persistent SimpleVectorStore.
     """
     from langchain_community.embeddings import HuggingFaceEmbeddings
-    from langchain_community.vectorstores import Chroma
+    from rag import SimpleVectorStore
 
     embedding_model = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
     print(f"Loading embedding model: {embedding_model}")
@@ -96,29 +89,30 @@ def create_vectorstore(chunks: list, persist_dir: str = CHROMA_DIR) -> None:
 
     # Clear existing collection to ensure idempotent re-ingestion
     if os.path.exists(persist_dir):
-        import shutil
         shutil.rmtree(persist_dir)
         print("Cleared existing vector store")
 
-    vectorstore = Chroma.from_documents(
+    # Create the directory again
+    os.makedirs(persist_dir, exist_ok=True)
+
+    vectorstore = SimpleVectorStore.from_documents(
         documents=chunks,
         embedding=embeddings,
         persist_directory=persist_dir,
-        collection_name=COLLECTION_NAME,
     )
 
-    print(f"Stored {len(chunks)} chunks in ChromaDB at {persist_dir}")
+    print(f"Stored {len(chunks)} chunks in SimpleVectorStore at {persist_dir}")
     return vectorstore
 
 
-def ingest_pipeline():
+def ingest_pipeline(docs_dir: str = DOCS_DIR):
     """Run the complete ingestion pipeline: load → chunk → embed → store."""
     print("=" * 60)
     print("DOCUMENT INGESTION PIPELINE")
     print("=" * 60)
 
     print("\n[1/3] Loading documents...")
-    docs = load_documents()
+    docs = load_documents(docs_dir)
 
     print("\n[2/3] Chunking documents...")
     chunks = chunk_documents(docs)
