@@ -1,0 +1,52 @@
+[
+  {
+    "question": "What is the primary driver of global warming since the pre-industrial era?",
+    "expected_answer": "The primary driver of global warming is the increase in atmospheric greenhouse gas concentrations, particularly carbon dioxide (CO2), methane (CH4), and nitrous oxide (N2O).",
+    "source_document": "climate_change_report.pdf"
+  },
+  {
+    "question": "Who coined the term Artificial Intelligence and when?",
+    "expected_answer": "John McCarthy coined the term Artificial Intelligence in 1956 at the Dartmouth Conference.",
+    "source_document": "artificial_intelligence_overview.pdf"
+  },
+  {
+    "question": "What percentage of global electricity generation came from renewable sources in 2023?",
+    "expected_answer": "As of 2023, renewable sources account for approximately 30% of global electricity generation.",
+    "source_document": "renewable_energy_policy.pdf"
+  },
+  {
+    "question": "What does NLP stand for and what is its purpose?",
+    "expected_answer": "NLP stands for Natural Language Processing. It is the branch of AI concerned with enabling computers to understand, interpret, and generate human language.",
+    "source_document": "artificial_intelligence_overview.pdf"
+  },
+  {
+    "question": "When did Python 2 reach end-of-life?",
+    "expected_answer": "Python 2 reached end-of-life in January 2020.",
+    "source_document": "python_programming_guide.pdf"
+  },
+  {
+    "question": "What is the economic value of ecosystem services threatened by climate change?",
+    "expected_answer": "The economic value of ecosystem services threatened by climate change is estimated at $33 trillion per year globally.",
+    "source_document": "climate_change_report.pdf"
+  },
+  {
+    "question": "What are generators in Python?",
+    "expected_answer": "Generators are functions that use the yield keyword to produce a sequence of values lazily, one at a time. They are memory-efficient for processing large datasets.",
+    "source_document": "python_programming_guide.pdf"
+  },
+  {
+    "question": "How much has the cost of whole genome sequencing fallen?",
+    "expected_answer": "The cost of whole genome sequencing has fallen from approximately $3 billion for the first human genome to under $600 today.",
+    "source_document": "healthcare_technology.pdf"
+  },
+  {
+    "question": "Who won Jeopardy! in 2011 according to the AI overview document?",
+    "expected_answer": "IBM Watson won Jeopardy! in 2011.",
+    "source_document": "artificial_intelligence_overview.pdf"
+  },
+  {
+    "question": "What is the estimated global cost of climate adaptation per year by 2030?",
+    "expected_answer": "The estimated global cost of climate adaptation is $140-300 billion per year by 2030.",
+    "source_document": "climate_change_report.pdf"
+  }
+]

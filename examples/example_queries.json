@@ -1,0 +1,62 @@
+[
+  {
+    "language": "en",
+    "question": "What is the Transformer architecture and when was it introduced?",
+    "type": "retrieval",
+    "expected": "Information about Vaswani et al., 2017 paper 'Attention Is All You Need', self-attention mechanisms."
+  },
+  {
+    "language": "hi",
+    "question": "पायथन में डिक्शनरी (dictionary) और टुपल (tuple) क्या हैं?",
+    "type": "multilingual_retrieval",
+    "expected": "Explanation of Python dictionaries (key-value mappings) and tuples (ordered, immutable sequences) translated into Hindi."
+  },
+  {
+    "language": "mr",
+    "question": "हवामान बदलाचा प्रवाळ भित्तिकांवर (coral reefs) काय परिणाम होत आहे?",
+    "type": "multilingual_retrieval",
+    "expected": "Information about coral bleaching and the vulnerability of coral reefs to temperature rises, translated into Marathi."
+  },
+  {
+    "language": "en",
+    "question": "How do I bake a chocolate cake?",
+    "type": "hallucination_check",
+    "expected": "'I could not find this information in the provided documents.' (Since baking is not in any PDF)."
+  },
+  {
+    "language": "en",
+    "question": "Compare the greenhouse gas emissions from the energy sector vs agriculture.",
+    "type": "multi_hop_retrieval",
+    "expected": "The energy sector accounts for 73% while agriculture accounts for 12%."
+  },
+  {
+    "language": "hi",
+    "question": "ग्लोबल वार्मिंग का प्राथमिक कारण क्या है?",
+    "type": "multilingual_retrieval",
+    "expected": "Increase in greenhouse gas concentrations (CO2, methane, nitrous oxide) translated into Hindi."
+  },
+  {
+    "language": "mr",
+    "question": "मशीन लर्निंग (Machine Learning) चे तीन मुख्य प्रकार कोणते आहेत?",
+    "type": "multilingual_retrieval",
+    "expected": "Supervised, unsupervised, and reinforcement learning translated into Marathi."
+  },
+  {
+    "language": "en",
+    "question": "What are the common design patterns used in Python?",
+    "type": "retrieval",
+    "expected": "Singleton, Factory, Observer, and Strategy."
+  },
+  {
+    "language": "en",
+    "question": "What is the global renewable energy capacity reached in 2022?",
+    "type": "retrieval",
+    "expected": "3,372 GW."
+  },
+  {
+    "language": "en",
+    "question": "How much has the cost of solar photovoltaic (PV) technology fallen since 2010?",
+    "type": "retrieval",
+    "expected": "Approximately 90%."
+  }
+]
