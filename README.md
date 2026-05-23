@@ -1,85 +1,234 @@
-# Multilingual Citation-Based RAG System
+<div align="center">
 
-A production-style Retrieval-Augmented Generation (RAG) system built to answer questions strictly from ingested PDF documents. Features include citation tracking, cross-document contradiction detection, confidence scoring, reranking, and multilingual support.
+<img src="./architecture.png" alt="Architecture" width="100%"/>
 
-![Architecture Diagram](./architecture.png)
+# 🌐 Multilingual Citation-Based RAG System
 
-## Features
+### Ask questions in **English**, **Hindi**, or **Marathi** — get answers grounded strictly in your documents.
 
-1. **Multilingual Query Processing**: Ask questions in English, Hindi, or Marathi. Non-English queries are seamlessly translated for optimal English-document retrieval, then translated back for the final answer.
-2. **Hallucination Prevention**: The system strictly anchors LLM responses to retrieved context. It clearly states "I could not find this information" if the answer isn't present in the source PDFs.
-3. **Citation & Source Tracking**: Every generated answer includes exact file, page, and chunk-level metadata.
-4. **Cross-Encoder Reranking**: Initial retrieval via ChromaDB is re-scored by `ms-marco-MiniLM-L-6-v2` for high-precision context selection.
-5. **Contradiction Detection**: A dedicated API endpoint and UI page to compare claims between two different documents on a specific topic.
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://potens-intern-ai-ml-nakshatra-mote-pxqbwccqhtrwfbut98mykf.streamlit.app/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-## System Architecture
+<br/>
 
-- **Backend**: FastAPI
-- **Frontend**: Streamlit
-- **Embeddings**: `sentence-transformers/all-MiniLM-L6-v2`
-- **Vector Database**: ChromaDB (persistent local storage)
-- **Reranker**: `cross-encoder/ms-marco-MiniLM-L-6-v2`
-- **LLM Provider**: Gemini 2.0 Flash or Groq (Llama-3.1)
-- **Orchestration**: LangChain
+> **"No hallucinations. No guesswork. Just answers — backed by your documents."**
 
-## Chunking Strategy
+</div>
 
-Documents are split using `RecursiveCharacterTextSplitter` with `chunk_size=500` and `chunk_overlap=100`. 
-- **Why?** Recursive splitting tries to break on natural linguistic boundaries (paragraphs, sentences, words) before resorting to hard character cuts. This prevents chopping sentences in half, maintaining semantic coherence.
-- **Size**: 500 characters provides enough context for the LLM without diluting the retrieval signal.
-- **Overlap**: 100 characters ensures no critical information is lost at the boundary of two chunks.
+---
 
-## Setup Instructions
+## ✨ What Makes This Different
+
+Most RAG systems give you an answer. This one gives you an answer **you can trust** — with citations, confidence scores, contradiction flags, and support for regional Indian languages built-in.
+
+| Feature | Description |
+|---|---|
+| 🗣️ **Multilingual** | Ask in English, Hindi, or Marathi |
+| 📄 **Citation Tracking** | File + page + chunk-level source attribution |
+| 🚫 **Hallucination Prevention** | Strictly anchored to retrieved context — says "I don't know" when needed |
+| 🔁 **Cross-Encoder Reranking** | Re-scores retrieval results with `ms-marco-MiniLM-L-6-v2` |
+| ⚡ **Contradiction Detection** | Compare claims across two documents via a dedicated endpoint |
+| 📊 **Confidence Scoring** | Heuristic confidence from top reranker scores |
+
+---
+
+## 🚀 Live Demo
+
+> Try it now — no setup required.
+
+**👉 [https://potens-intern-ai-ml-nakshatra-mote-pxqbwccqhtrwfbut98mykf.streamlit.app/](https://potens-intern-ai-ml-nakshatra-mote-pxqbwccqhtrwfbut98mykf.streamlit.app/)**
+
+Upload a PDF, ask a question in any supported language, and get a cited, grounded answer in seconds.
+
+---
+
+## 🏗️ System Architecture
+
+```
+User Query (EN / HI / MR)
+        │
+        ▼
+ ┌─────────────────┐
+ │  Translation    │  ← deep-translator (Google Translate)
+ │  (→ English)   │
+ └────────┬────────┘
+          │
+          ▼
+ ┌─────────────────┐     ┌──────────────────────┐
+ │  ChromaDB       │────▶│  Cross-Encoder        │
+ │  Vector Search  │     │  Reranker             │
+ │  (MiniLM-L6-v2) │     │  (ms-marco-MiniLM)   │
+ └─────────────────┘     └──────────┬───────────┘
+                                    │
+                          Top-K Reranked Chunks
+                          + Citation Metadata
+                                    │
+                                    ▼
+                         ┌──────────────────┐
+                         │  LLM Generation  │
+                         │  Gemini 2.0 Flash│
+                         │     or Groq      │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │  Back-Translation│  ← if query was non-English
+                         │  (→ HI / MR)    │
+                         └──────────────────┘
+                                  │
+                                  ▼
+                    Final Answer + Citations + Confidence
+```
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Backend** | FastAPI |
+| **Frontend** | Streamlit |
+| **Embeddings** | `sentence-transformers/all-MiniLM-L6-v2` |
+| **Vector DB** | ChromaDB (persistent local) |
+| **Reranker** | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
+| **LLM** | Gemini 2.0 Flash / Groq (Llama-3.1) |
+| **Orchestration** | LangChain |
+| **Translation** | `deep-translator` |
+
+---
+
+## 📦 Chunking Strategy
+
+Documents are split using `RecursiveCharacterTextSplitter`:
+
+```python
+chunk_size    = 500   # characters
+chunk_overlap = 100   # characters
+```
+
+**Why this configuration?**
+
+- **Recursive splitting** tries natural linguistic boundaries (paragraphs → sentences → words) before hard cuts — prevents mid-sentence breaks.
+- **500 characters** gives the LLM enough context per chunk without diluting the retrieval signal.
+- **100-char overlap** ensures no critical information is silently dropped at chunk boundaries.
+
+---
+
+## ⚙️ Setup & Installation
 
 **Prerequisites:** Python 3.10+
 
-1. **Clone and Setup Environment**
-   ```bash
-   git clone <repo-url>
-   cd multilingual-rag
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+### 1. Clone and create environment
 
-2. **Configure Environment Variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env to add your GEMINI_API_KEY or GROQ_API_KEY
-   ```
+```bash
+git clone https://github.com/nakshaatraa/potens-intern-ai-ml-nakshatra-mote
+cd potens-intern-ai-ml-nakshatra-mote
+python -m venv venv
+source venv/bin/activate       # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-3. **Generate Sample Documents & Ingest**
-   ```bash
-   python generate_docs.py
-   python ingest.py
-   ```
+### 2. Configure API keys
 
-4. **Run the Application**
-   ```bash
-   # Start the FastAPI backend (Terminal 1)
-   uvicorn api:app --reload
-   
-   # Start the Streamlit frontend (Terminal 2)
-   streamlit run app.py
-   ```
+```bash
+cp .env.example .env
+# Open .env and add your GEMINI_API_KEY or GROQ_API_KEY
+```
 
-## Limitations & Edge Cases
+### 3. Generate sample docs and ingest
 
-- **Translation Errors**: The system uses `deep-translator` (Google Translate wrapper) which may occasionally misinterpret highly technical jargon in Hindi or Marathi.
-- **Chunk Boundary Drops**: Even with a 100-character overlap, highly complex multi-paragraph concepts might be split across chunks, occasionally causing incomplete retrieval.
-- **Heuristic Confidence**: The confidence score is a simple heuristic average of the top 3 cross-encoder reranker scores. It represents retrieval confidence, not necessarily factual confidence of the generated text.
-- **Probabilistic Contradictions**: The contradiction detection relies on LLM analysis. Edge cases in nuanced language might result in false positive/negative conflict detection.
+```bash
+python generate_docs.py
+python ingest.py
+```
 
-## Evaluation
+### 4. Run the application
 
-An evaluation set is provided in `evaluation/eval_set.json`. Run the automated evaluation suite:
+```bash
+# Terminal 1 — FastAPI backend
+uvicorn api:app --reload
+
+# Terminal 2 — Streamlit frontend
+streamlit run app.py
+```
+
+> 🌐 Frontend will open at `http://localhost:8501`  
+> 📡 API docs available at `http://localhost:8000/docs`
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/ask` | Ask a question; returns answer + citations + confidence |
+| `POST` | `/contradict` | Compare claims between two documents on a topic |
+| `POST` | `/ingest` | Ingest a new PDF into the vector store |
+| `GET` | `/health` | Health check |
+
+---
+
+## 🧪 Evaluation
+
+An evaluation set is provided in `evaluation/eval_set.json`. Run the automated suite:
+
 ```bash
 python evaluation/evaluate.py
 ```
 
-## AI Usage Disclosure
-*This project was developed with the assistance of AI coding tools for scaffolding, boilerplate generation, and initial logic structuring.*
+Metrics tracked: retrieval precision, answer faithfulness, citation accuracy.
 
-## Screenshots
+---
 
-*(Placeholder for UI screenshots: Ask Question page, Citation Panel expanded, Contradiction Check results)*
+## ⚠️ Known Limitations
+
+| Limitation | Details |
+|---|---|
+| **Translation Errors** | `deep-translator` may misinterpret highly technical jargon in Hindi/Marathi |
+| **Chunk Boundary Drops** | Multi-paragraph concepts may occasionally be split across chunks |
+| **Heuristic Confidence** | Confidence = average of top-3 reranker scores; reflects *retrieval* quality, not factual accuracy |
+| **Probabilistic Contradictions** | LLM-based — nuanced edge cases may produce false positives/negatives |
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Add support for more Indian languages (Tamil, Telugu, Gujarati)
+- [ ] Persistent user sessions and conversation history
+- [ ] Table and chart extraction from PDFs
+- [ ] Fine-tuned confidence calibration
+- [ ] Docker / cloud deployment guide
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first.
+
+1. Fork the repo
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+---
+
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for details.
+
+---
+
+## 🙏 AI Usage Disclosure
+
+This project was developed with the assistance of AI coding tools for scaffolding, boilerplate generation, and initial logic structuring.
+
+---
+
+<div align="center">
+
+Made with ❤️ by [Nakshatra Mote](https://github.com/nakshaatraa)
+
+[![Live Demo](https://img.shields.io/badge/🚀_Try_Live_Demo-Click_Here-FF4B4B?style=for-the-badge)](https://potens-intern-ai-ml-nakshatra-mote-pxqbwccqhtrwfbut98mykf.streamlit.app/)
+
+</div>
