@@ -48,7 +48,7 @@ def run_evaluation():
             
             print(f"  Expected Source: {expected_source}")
             print(f"  Actual Sources: {sources_used}")
-            print(f"  Source Match: {'✅' if source_match else '❌'}")
+            print(f"  Source Match: {'[YES]' if source_match else '[NO]'}")
             print(f"  Confidence: {confidence:.2f}")
             print()
             
