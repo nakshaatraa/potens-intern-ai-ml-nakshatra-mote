@@ -1,6 +1,6 @@
 import streamlit as st
 import httpx
-import pandas as pd
+import os
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 # Custom CSS for a premium look
 st.markdown("""
